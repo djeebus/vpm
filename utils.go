@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/vroomy/plugins"
@@ -28,4 +29,15 @@ func removeBranchHash(gitURL string) (out string) {
 	out = strings.Split(gitURL, "#")[0]
 	out = strings.Split(out, "@")[0]
 	return
+}
+
+func getGoPath() (string, error) {
+	goEnvCmd := exec.Command("go", "env", "GOPATH")
+	output, err := goEnvCmd.CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+
+	goPath := strings.TrimSpace(string(output))
+	return goPath, nil
 }

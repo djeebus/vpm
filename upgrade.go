@@ -1,10 +1,8 @@
 package main
 
 import (
-	"os/exec"
 	"os/user"
 	"path"
-	"strings"
 
 	gomu "github.com/hatchify/mod-utils"
 	flag "github.com/hatchify/parg"
@@ -20,17 +18,6 @@ func printVersion(cmd *flag.Command) (err error) {
 	return
 }
 
-func getGoPath() (string, error) {
-	goEnvCmd := exec.Command("go", "env", "GOPATH")
-	output, err := goEnvCmd.CombinedOutput()
-	if err != nil {
-		return "", err
-	}
-
-	goPath := strings.TrimSpace(string(output))
-	return goPath, nil
-}
-
 func upgrade(cmd *flag.Command) (err error) {
 	var (
 		output         string
@@ -42,6 +29,7 @@ func upgrade(cmd *flag.Command) (err error) {
 		latestTag      string
 		hasChanges     bool
 		usr            *user.User
+		goPath		   string
 	)
 
 	usr, err = user.Current()
@@ -50,10 +38,11 @@ func upgrade(cmd *flag.Command) (err error) {
 	}
 
 	// libraries should be in GOPATH, implementation found in cmd/go/internal/cfg/cfg.go, `
-	goPath, err := getGoPath()
+	goPath, err = getGoPath()
 	if err != nil {
 		return
 	}
+
 	lib := gomu.LibraryFromPath(path.Join(goPath, "src", "github.com", "vroomy", "vpm"))
 	lib.File.Fetch()
 
